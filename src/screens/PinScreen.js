@@ -1,42 +1,54 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, View, Platform, TextInput } from 'react-native'
+import { StyleSheet, View, Platform, TextInput, Alert } from 'react-native'
 import styled from 'styled-components';
 import {Fontisto} from '@expo/vector-icons';
 import Text from '../components/Text';
 import NumberPad from '../components/NumberPad';
 import axios from 'axios';
+import USER_ID from '../../Consts';
 
 const code = []
-
 const PinScreen = ({navigation}) => {
+
     const [pinCount, setPinCount] = useState(0);
+    const [rib, setRib] = useState("");
     const totalPins = 6;
     let codeString ="";
+
     useEffect(() => {
         if(pinCount === totalPins){
-          for(let i = 0;i<code.length;i++){
-              codeString+=code[i];
-          }
-          console.log(codeString);
-          axios.post('http://192.168.1.6:999/api/v1/login', {
-            log: 'client1',
-            pas: codeString,
-            typ:'client'
-          })
-          .then(function (response) {
-            if(response.data != -1){
-              navigation.navigate("Tabs")
+            for(let i = 0;i<code.length;i++){
+                codeString+=code[i];
             }
-            else{
-                navigation.navigate("Pin")
-            }
+            console.log(codeString);
+            axios.post('http://192.168.43.39:999/api/v1/login', {
+                log: rib,
+                pas: codeString,
+                typ:'client'
+            })
+            .then(function (response) {
+                if(response.data != -1){
 
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+                    navigation.navigate("Tabs")
+                }
+                else{
+                  Alert.alert(
+                "Attention",
+                "Rib ou password incorrect",
+                [
+
+                  { text: "Ok" }
+                ]
+              );
+                    navigation.navigate("Pin")
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         }
     }, [pinCount])
+
     const renderPins = () => {
         const pins = []
         for(let x = 1; x <= totalPins; x++){
@@ -50,24 +62,21 @@ const PinScreen = ({navigation}) => {
                 )
             )
         }
-
         return pins;
     };
 
     const pressKey = (_, index) => {
         setPinCount(prev => {
-          if(index == 10){
+        if(index == 10){
             code.pop();
-          }
-          else{
-              code.push(_);
-          }
-          if(prev<0){
+        }
+        else{
+            code.push(_);
+        }
+        if(prev<0){
             prev = 0;
-          }
-
-
-          return index != 10 ? prev + 1 : prev - 1
+        }
+        return index != 10 ? prev + 1 : prev - 1
         })
     }
 
@@ -79,18 +88,13 @@ const PinScreen = ({navigation}) => {
             <User>
                 <UserDetails>
                 <SearchContainer>
-                    <Search placeholder="RIB" />
+                    <Search placeholder="RIB" onChangeText={rib => setRib(rib)} />
                 </SearchContainer>
                 </UserDetails>
             </User>
-
-
             <AccessPin>
                 {renderPins()}
             </AccessPin>
-
-
-
             <NumberPad onPress={pressKey} />
         </View>
     )
@@ -159,11 +163,11 @@ const Pin = styled.View`
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#1e1e1e',
+    flex: 1,
+    backgroundColor: '#1e1e1e',
       //alignItems: 'center',
       //justifyContent: 'center',
-      paddingTop: Platform.OS === "android" ? 20 : 0
+    paddingTop: Platform.OS === "android" ? 20 : 0
     },
 });
 

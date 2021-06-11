@@ -1,23 +1,73 @@
 import React, {useState} from 'react'
-import { StyleSheet, View, Platform } from 'react-native'
+import { StyleSheet, View, Platform, Alert } from 'react-native'
 import styled from "styled-components";
 import Text from '../components/Text';
 import {MaterialIcons} from '@expo/vector-icons';
 import NumberPad from '../components/NumberPad';
-
+import info from './info';
+import axios from 'axios';
 
 const SendRequestScreen = () => {
-    const [amount, setAmount] = useState("0");
+    const [amount, setAmount] = useState("");
+    const [rib, setRib] = useState("");
 
     const convertToMad = (currentAmount) => {
+
         const newAmount = currentAmount
 
         return newAmount.toLocaleString("en-US", {styled: "currency", currency: "MAD"});
     }
 
+    const virement = () => {
+      console.log(info)
+     var date = new Date();
+     var month = new Date().getMonth() + 1;
+     var year = new Date().getFullYear();
+     var a = parseFloat(amount+'.0');
+     console.log(amount+'.0')
+     var _date = year + '-' + month +'-' + date;
+
+      if(rib !="" && amount != "" && info[0] != rib){
+        axios.post('http://192.168.43.39:999/api/v1/virement/add', {
+
+          "virement":date,
+          "montant":amount+'.0',
+          "compte_deb":{"id":parseInt(info[0])},
+          "compte_cred":{"id":parseInt(rib)}
+        })
+
+        .then(function (response) {
+          Alert.alert(
+        "Success",
+        "Votre virement a bien ete traité ",
+        [
+
+          { text: "OK" }
+        ]
+      );
+      setVir(0);
+      setRib(0);
+
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+      }
+      else{
+        Alert.alert(
+      "Attention",
+      "Remplir tous les champs",
+      [
+
+        { text: "OK" }
+      ]
+    );
+      }
+    }
     const pressKey = (item, index) => {
         setAmount((prev) => {
-            return parseInt(index != 10 ? prev + item : prev.slice(0, prev.length - 1));
+            return index != 10 ? prev + item : prev.slice(0, prev.length - 1);
         })
     }
 
@@ -33,12 +83,12 @@ const SendRequestScreen = () => {
                 <ProfilePhoto source={require('../../assets/profile.png')} />
                 <UserDetails>
                 <SearchContainer>
-                    <Search placeholder="RIB" />
+                    <Search  onChangeText={rib => setRib(rib)} placeholder="RIB" />
                 </SearchContainer>
                 </UserDetails>
             </User>
 
-            <Send>
+            <Send onPress={virement}>
                 <Text medium heavy>Send {convertToMad(amount)} MAD </Text>
             </Send>
 
@@ -53,7 +103,7 @@ const Amount = styled.View`
     margin-top: 50px;
     align-items: center;
     justify-content:center
-    
+
 `;
 
 const ProfilePhoto = styled.Image`

@@ -1,5 +1,5 @@
 //import { Header } from '@react-navigation/stack';
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { StyleSheet, View, Platform, Dimensions } from 'react-native';
 import styled from "styled-components";
 import Text from "../components/Text";
@@ -7,84 +7,65 @@ import {FontAwesome5, MaterialIcons, AntDesign} from "@expo/vector-icons";
 import purchasesData from "../../purchasesData";
 import {LineChart} from 'react-native-chart-kit';
 import axios from 'axios';
-
-var solde = 0;
-
-
-function getSolde(){
-    
-    axios.get("http://localhost:999/api/v1/client/find/compte/",{id:1}).then(res =>{
-        const compte = res.data;
-        console.log(res);
-        solde = compte.solde;
-    }).catch(error => {console.log(error)})
-}
+import Consts from '../../Consts';
+import Moment from 'moment';
+import info from './info';
 
 
 const HomeScreen = ({navigation}) => {
-    getSolde();
-    
+
+    const [solde, setSolde] = useState("");
+    const [user, setUser] = useState([]);
+    const [vir, setVir] = useState("");
+    const [nom, setNom] = useState("");
+
+    useEffect(()=>{
+      const unsubscribe = navigation.addListener('focus', () => {
+        axios.get("http://192.168.43.39:999/api/v1/client/find/compte/3").then(res =>{
+            const compte = res.data;
+            setUser(compte);
+        }).catch(error => {console.log(error)});
+        axios.get("http://192.168.43.39:999/api/v1/compte/find/virement/5").then(res =>{
+            const virement = res.data;
+            setVir(virement);
+        }).catch(error => {console.log(error)});
+
+
+      });
+      return unsubscribe;
+    },[navigation])
+    const setVariable = ()=>{
+      info.pop();
+      info.push(user.id);
+      return(
+        <Header>
+            <ProfilePhoto source={require('../../assets/bank.png')} />
+            <Welcome>
+                <Text heavy medium>Welcome </Text>
+                <Text>Bank of Afirica</Text>
+            </Welcome>
+            <FontAwesome5 name="sign-out-alt" size={24} color="#565656"  onPress={() => navigation.navigate('Pin')} />
+        </Header>
+      )
+    }
+
     const renderPurchases = ({item}) => {
+
         return(
             <Purchase>
                 <PurchaseInfo>
-                    <Text heavy>{item.product}</Text>
-                    <Text bold margin="2px 0 2px 0">{item.store}</Text>
-                    <Text small color="#727479">{item.address}</Text>
+                    <Text heavy>{item.compte_cred.client.nom} {item.compte_cred.client.prenom}</Text>
+                    <Text bold margin="2px 0 2px 0">{ Moment(item.virement).format('DD MMM YYYY HH:mm')}</Text>
                 </PurchaseInfo>
-                <Text heavy>{item.price}</Text>
+                <Text heavy>{item.montant} MAD</Text>
             </Purchase>
         );
     };
-    //console.log("purchasesData: ", purchasesData)
+
     return (
         <View style={styles.container}>
-            <Header>
-
-                <ProfilePhoto source={require('../../assets/bank.png')} />
-                <Welcome>
-                    <Text heavy medium>Welcome,</Text>
-                    <Text>Bank of Afirica</Text>
-                </Welcome>
-                <FontAwesome5 name="sign-out-alt" size={24} color="#565656"  onPress={() => navigation.navigate('Pin')} />
-            </Header>
-
-            <Text center title black>{solde} MAD</Text>
-            <Text center heavy color="#727479">Solde</Text>
-
-            <Chart>
-                <LineChart
-                    data={{
-                        labels: ["May", "June", "July", "Aug", "Sept", "Oct"],
-                        datasets: [
-                            {
-                                data: [
-                                    Math.random() * 10,
-                                    Math.random() * 10,
-                                    Math.random() * 10,
-                                    Math.random() * 10,
-                                    Math.random() * 10,
-                                    Math.random() * 10
-                                ],
-                            },
-                        ],
-                    }}
-                    width={Dimensions.get('window').width}
-                    height={160}
-                    yAxisLabel="$"
-                    yAxisSuffix="k"
-                    chartConfig={{
-                        backgroundGradientFrom: "#1e1e1e",
-                        backgroundGradientTo: "#1e1e1e",
-                        color: (opacity = 1) => `rgba(81, 150, 244, ${opacity})`,
-                        labelColor: () => `rgba(255, 255, 255, 0.2)`,
-                        strokeWidth: 3,
-                    }}
-                    withVerticalLines={false}
-                    withHorizontalLines={false}
-                    bezier
-                />
-            </Chart>
+            {setVariable()}
+            <Text center title black>{user.solde} MAD</Text>
 
             <Purchases
                 ListHeaderComponent={
@@ -99,7 +80,7 @@ const HomeScreen = ({navigation}) => {
                         </SearchContainer>
                     </>
                 }
-                data={purchasesData}
+                data={vir}
                 renderItem={renderPurchases}
                 showsVerticalScrollIndicator={false}
             />
@@ -172,8 +153,8 @@ const PurchaseInfo = styled.View``;
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#1e1e1e',
+    flex: 1,
+    backgroundColor: '#1e1e1e',
     //   alignItems: 'center',
     //   justifyContent: 'center',
       //paddingTop: Platform.OS === "android" ? 20 : 0

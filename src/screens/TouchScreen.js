@@ -8,11 +8,11 @@ import Text from '../components/Text';
 const TouchScreen = ({navigation}) => {
   return (
       <View style={styles.container}>
-        <Text center heavy title color="#964ff0" margin="32px 0 0 0">
-            mybank
+        <Text center heavy title color="#3b5998" margin="60px 0 0 0">
+            Bank of Africa
         </Text>
 
-        <Touch onLongPress={() => navigation.navigate("Tabs")} delayPressIn={0}>
+        <Touch onLongPress={() => navigation.navigate("Pin")} delayPressIn={0}>
             <Circle bgColor="#1e1e1e">
                 <Circle bgColor="#5196f405">
                     <Circle bgColor="#5196f410">
@@ -27,7 +27,7 @@ const TouchScreen = ({navigation}) => {
         </Touch>
 
         <Text center heavy large>
-            Touch ID sensor for access to{"\n"}your mybank account.
+            Touch ID sensor for access to{"\n"}your BMCE account.
         </Text>
         <Text center bold margin="16px 0 0 0" color="#9c9c9f">
             Please very your identity{"\n"}using Touch ID

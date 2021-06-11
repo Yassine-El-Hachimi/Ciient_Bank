@@ -54,10 +54,11 @@ const App = () => {
   const TabStackScreens = () => {
     return (
       <TabStack.Navigator tabBarOptions={tabBarOptions} screenOptions={screenOptions}>
-      <TabStack.Screen name="Home"  component={HomeScreen} />
+      <TabStack.Screen name="Home"  onPress={() => window.location.reload(true)} component={HomeScreen} />
 
         <TabStack.Screen
           name="SendRequest"
+
           component={SendRequestScreen}
           options={{title: "Virement"}}
         />
@@ -83,6 +84,8 @@ const App = () => {
     </NavigationContainer>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
