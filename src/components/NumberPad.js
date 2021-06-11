@@ -41,7 +41,8 @@ const KeyPad = styled.View`
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    margin: 0 30px;
+    margin: 0 10px;
+    justify-content: center;
 `;
 
 const Number = styled.TouchableOpacity`

@@ -42,23 +42,20 @@ const CardsScreen = () => {
                     <CardLogo source={item.logo} resizeMode="contain" />
                 </CardLogoContainer>
                 <CardDetails>
-                    <Text heavy>
+                    <Text>
                         <Text medium heavy>{item.number}</Text>
                     </Text>
                 </CardDetails>
-            </CardInfo>
-            <CardActions>
-
                 <Update>
                     <Text heavy>Effectuer</Text>
                 </Update>
-            </CardActions>
+            </CardInfo>
         </CardContainer>;
 
 
     return (
         <View style={styles.container}>
-            <Text center large heavy margin="40px 0 0 0">Recharge & Facture</Text>
+            <Text center large heavy margin="20px 0 0 0">Recharge & Facture</Text>
 
             <Cards data={myCards} renderItem={renderCard} />
 
@@ -73,10 +70,10 @@ const Cards = styled.FlatList`
 `;
 
 const CardContainer = styled. View`
-     background-color: #292929;
-     margin-bottom: 16px;
-     padding: 16px;
-     border-radius: 8px;
+    background-color: #292929;
+    margin-bottom: 16px;
+    padding: 16px;
+    border-radius: 8px;
 `;
 
 const CardInfo = styled.View`
@@ -106,7 +103,8 @@ const CardLogo = styled.Image`
 
 const CardDetails = styled.View`
     flex: 1;
-    align-items: flex-end;
+    margin: 15px;
+    align-items: flex-start;
 `;
 
 const CardActions = styled.View`

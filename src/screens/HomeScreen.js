@@ -6,9 +6,24 @@ import Text from "../components/Text";
 import {FontAwesome5, MaterialIcons, AntDesign} from "@expo/vector-icons";
 import purchasesData from "../../purchasesData";
 import {LineChart} from 'react-native-chart-kit';
+import axios from 'axios';
+
+var solde = 0;
+
+
+function getSolde(){
+    
+    axios.get("http://localhost:999/api/v1/client/find/compte/",{id:1}).then(res =>{
+        const compte = res.data;
+        console.log(res);
+        solde = compte.solde;
+    }).catch(error => {console.log(error)})
+}
 
 
 const HomeScreen = ({navigation}) => {
+    getSolde();
+    
     const renderPurchases = ({item}) => {
         return(
             <Purchase>
@@ -34,7 +49,7 @@ const HomeScreen = ({navigation}) => {
                 <FontAwesome5 name="sign-out-alt" size={24} color="#565656"  onPress={() => navigation.navigate('Pin')} />
             </Header>
 
-            <Text center title black>9,184.17 MAD</Text>
+            <Text center title black>{solde} MAD</Text>
             <Text center heavy color="#727479">Solde</Text>
 
             <Chart>

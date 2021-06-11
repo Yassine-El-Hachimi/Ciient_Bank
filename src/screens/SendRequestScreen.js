@@ -17,7 +17,7 @@ const SendRequestScreen = () => {
 
     const pressKey = (item, index) => {
         setAmount((prev) => {
-            return index != 10 ? prev + item : prev.slice(0, prev.length - 1);
+            return parseInt(index != 10 ? prev + item : prev.slice(0, prev.length - 1));
         })
     }
 
@@ -25,7 +25,7 @@ const SendRequestScreen = () => {
         <View style={styles.container}>
 
             <Amount>
-                <Text title heavy>{convertToMad(amount)}MAD</Text>
+                <Text title heavy>{convertToMad(amount)} MAD</Text>
                 <Text bold color="#727479">Choose amount to send</Text>
             </Amount>
 
@@ -39,7 +39,7 @@ const SendRequestScreen = () => {
             </User>
 
             <Send>
-                <Text medium heavy>Send ${convertToMad(amount)} to My Bank</Text>
+                <Text medium heavy>Send {convertToMad(amount)} MAD </Text>
             </Send>
 
             <NumberPad onPress={pressKey} />
@@ -52,6 +52,8 @@ const SendRequestScreen = () => {
 const Amount = styled.View`
     margin-top: 50px;
     align-items: center;
+    justify-content:center
+    
 `;
 
 const ProfilePhoto = styled.Image`
