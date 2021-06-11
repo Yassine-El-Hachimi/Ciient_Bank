@@ -1,17 +1,40 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, View, Platform } from 'react-native'
+import { StyleSheet, View, Platform, TextInput } from 'react-native'
 import styled from 'styled-components';
 import {Fontisto} from '@expo/vector-icons';
 import Text from '../components/Text';
 import NumberPad from '../components/NumberPad';
+import axios from 'axios';
+
+const code = []
 
 const PinScreen = ({navigation}) => {
     const [pinCount, setPinCount] = useState(0);
     const totalPins = 6;
-
+    let codeString ="";
     useEffect(() => {
         if(pinCount === totalPins){
-            navigation.navigate("Tabs")
+          for(let i = 0;i<code.length;i++){
+              codeString+=code[i];
+          }
+          console.log(codeString);
+          axios.post('http://192.168.1.6:999/api/v1/login', {
+            log: 'client1',
+            pas: codeString,
+            typ:'client'
+          })
+          .then(function (response) {
+            if(response.data != -1){
+              navigation.navigate("Tabs")
+            }
+            else{
+                navigation.navigate("Pin")
+            }
+
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
         }
     }, [pinCount])
     const renderPins = () => {
@@ -30,39 +53,45 @@ const PinScreen = ({navigation}) => {
 
         return pins;
     };
-    
+
     const pressKey = (_, index) => {
         setPinCount(prev => {
-            return index != 10 ? prev + 1 : prev - 1
+          if(index == 10){
+            code.pop();
+          }
+          else{
+              code.push(_);
+          }
+          if(prev<0){
+            prev = 0;
+          }
+
+
+          return index != 10 ? prev + 1 : prev - 1
         })
     }
 
     return (
         <View style={styles.container}>
-            <Text center heavy title color="#964ff0" margin="32px 0 0 0">
-                mybank
+            <Text center heavy title color="#3b5998" margin="60px 0 0 20px">
+                Bank Of Africa
             </Text>
-            <Text center heavy medium margin="32px 0 0 0">
-                Enter your PIN code.
-            </Text>
+            <User>
+                <UserDetails>
+                <SearchContainer>
+                    <Search placeholder="RIB" />
+                </SearchContainer>
+                </UserDetails>
+            </User>
+
 
             <AccessPin>
                 {renderPins()}
             </AccessPin>
 
-            <Text center bold margin="8px 0 0 0" color="#9c9c9f">
-                Forget PIN?
-            </Text>
 
-            <UseTouch onPress={() => navigation.navigate("Touch")} delayPressIn={0}>
-                <Fontisto name="locked" color="#964ff0" size={16} />
-                <Text bold margin="0 0 0 8px" color="#964ff0">
-                    Use Touch ID
-                </Text>
-            </UseTouch>
 
             <NumberPad onPress={pressKey} />
-            <StatusBar barStyle="light-content" />
         </View>
     )
 }
@@ -79,10 +108,30 @@ const AccessPin = styled.View`
     margin: 32px 64px 16px 64px;
 `;
 
-const StatusBar = styled.StatusBar`
 
+const SearchContainer = styled.View`
+    background-color: #3d3d3d;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 0px;
+    border-radius: 6px;
 `;
 
+const Search = styled.TextInput`
+    flex: 1;
+    padding: 13px 16px;
+    color: #dbdbdb;
+`;
+const UserDetails = styled.View`
+    flex: 1;
+    margin: 0 20px;
+`;
+
+const User = styled.View`
+    margin: 20px 10px;
+    flex-direction: row;
+    align-items: center;
+`;
 const UseTouch = styled.TouchableOpacity`
     margin: 32px 0 64px 0;
     flex-direction: row;
@@ -117,6 +166,6 @@ const styles = StyleSheet.create({
       paddingTop: Platform.OS === "android" ? 20 : 0
     },
 });
-  
+
 
 export default PinScreen;
